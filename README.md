@@ -153,7 +153,9 @@ Example:
 - Log location: /var/log/my-server-app/
 ```
 
-### 3. Configure Settings (Optional)
+### 3. Configure Settings
+
+Make a copy of `config/settings-template.yaml` to `config/settings.yaml`
 
 Edit `config/settings.yaml` to set 
 

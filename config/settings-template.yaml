@@ -1,0 +1,76 @@
+# Support Agent Configuration
+
+app:
+  name: "Support Agent"
+  version: "0.1.0"
+
+# Channel configurations
+channels:
+  whatsapp:
+    enabled: true
+    device_name: "Support Agent Bot"
+
+  # Future channels (disabled for now)
+  slack:
+    enabled: false
+  telegram:
+    enabled: false
+
+# Tool configurations
+tools:
+  # SSH server access tool
+  server_ssh:
+    enabled: true
+    ssh_jump_host: "jump.example.com"
+    ssh_username: "username"
+    ssh_key_file: "~/Documents/key.pem"
+    timeout: 30
+
+  # Database query tool
+  database:
+    enabled: true
+    host: "db.server"  # Database server hostname
+    port: 3306  # MySQL port
+    username: "readonly_user"
+    password: "strong_password"
+    connection_timeout: 30
+    max_rows: 100
+    # SSH tunnel configuration (for accessing DB through jump host)
+    use_ssh_tunnel: true
+
+  # System status tool
+  system_status:
+    enabled: true
+
+# LLM settings (can override env vars)
+llm:
+  # provider: ollama  # Uncomment to override env
+  # model: llama2     # Uncomment to override env
+  temperature: 0.7
+  max_tokens: 8000
+  system_prompt: |
+    You are a helpful support agent for server infrastructure with access to powerful tools.
+
+    ⚠️ CRITICAL RULE: When user asks you to DO something, respond with a tool call JSON, NOT explanatory text!
+
+    WHEN TO USE TOOLS (respond with JSON only):
+    - "connect to <server>" or "check <server>" → execute_remote_server_command
+    - "query database" or "get from database" → execute_database_query
+    - "check system status" → get_system_status
+    - "list servers" or direct ssh_jump_host access → execute_ssh_command
+
+    ❌ WRONG: "I need to check the status..." (explaining what you'll do)
+    ✅ RIGHT: {"tool": "execute_remote_server_command", "args": {...}} (actually doing it)
+
+    Example conversation:
+    User: "connect to appserver1 and show status of nginx"
+    You: {"tool": "execute_remote_server_command", "args": {"server_name": "Appserver1", "command": "systemctl status nginx"}}
+
+    Only respond with text AFTER you have tool results to share with the user.
+    Be concise and professional. Use tools rather than guessing.
+
+# Whisper settings
+voice:
+  # model: base  # Uncomment to override env
+  language: "en"
+  task: "transcribe"
