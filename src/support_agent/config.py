@@ -80,7 +80,26 @@ class Settings(BaseSettings):
 def load_settings() -> Settings:
     """Load application settings.
 
+    YAML config is loaded first as defaults; environment variables take precedence.
+
     Returns:
         Settings instance with environment variables loaded
     """
-    return Settings()
+    # Load YAML defaults first
+    base = Settings()
+    yaml_config = base.load_yaml_config()
+
+    # Map nested YAML keys to flat Settings fields
+    llm = yaml_config.get("llm", {})
+    yaml_defaults = {}
+    if "provider" in llm:
+        yaml_defaults["llm_provider"] = llm["provider"]
+    if "model" in llm:
+        yaml_defaults["llm_model"] = llm["model"]
+    if "temperature" in llm:
+        yaml_defaults["llm_temperature"] = llm["temperature"]
+    if "max_tokens" in llm:
+        yaml_defaults["llm_max_tokens"] = llm["max_tokens"]
+
+    # Re-create Settings with YAML values as defaults; env vars still win
+    return Settings(**yaml_defaults)
