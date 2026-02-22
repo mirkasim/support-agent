@@ -226,6 +226,17 @@ class OpenAILLM(BaseLLM):
         """
         import re
 
+        cleaned = text
+
+        # Remove complete <think>...</think> blocks (including multiline)
+        cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL | re.IGNORECASE)
+
+        # Remove partial think blocks: text before </think> when no opening <think> tag
+        # This handles responses where <think> was stripped/missing but </think> remains
+        if "</think>" in cleaned.lower():
+            end_tag_pos = cleaned.lower().rfind("</think>")
+            cleaned = cleaned[end_tag_pos + len("</think>"):]
+
         # Remove lines that start with thinking indicators
         thinking_patterns = [
             r"^Let me think.*?\n",
@@ -239,7 +250,6 @@ class OpenAILLM(BaseLLM):
             r"^Reasoning:.*?\n",
         ]
 
-        cleaned = text
         for pattern in thinking_patterns:
             cleaned = re.sub(pattern, "", cleaned, flags=re.IGNORECASE | re.MULTILINE)
 
