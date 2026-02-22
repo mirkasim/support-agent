@@ -36,6 +36,13 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header-center {
+            flex: 1;
             text-align: center;
         }
 
@@ -55,6 +62,24 @@
 
         .chat-header .status.disconnected {
             color: #f87171;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.35);
         }
 
         .chat-messages {
@@ -248,8 +273,12 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🤖 Support Agent</h1>
-            <div class="status disconnected" id="status">Connecting...</div>
+            <div style="width: 80px;"></div>
+            <div class="chat-header-center">
+                <h1>Support Agent</h1>
+                <div class="status disconnected" id="status">Connecting...</div>
+            </div>
+            <a href="/logout" class="logout-btn">Sign out</a>
         </div>
 
         <div class="chat-messages" id="messages">
@@ -313,8 +342,15 @@
                 updateStatus('disconnected');
             };
 
-            ws.onclose = () => {
+            ws.onclose = (event) => {
                 console.log('Disconnected from support agent');
+
+                // Session expired or unauthorized — redirect to login
+                if (event.code === 4001) {
+                    window.location.href = '/login';
+                    return;
+                }
+
                 updateStatus('disconnected');
                 messageInput.disabled = true;
                 sendButton.disabled = true;
