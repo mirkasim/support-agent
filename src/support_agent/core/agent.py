@@ -211,7 +211,7 @@ Server list result: {tool_result}"""
 
 [Analyze the result. If you have enough information, provide your final answer. Otherwise, call another tool.]"""
 
-                    context.add_message("assistant", tool_result_msg)
+                    context.add_message("user", tool_result_msg)
 
                     # Continue loop to allow another tool call
                     tool_iteration += 1

@@ -123,6 +123,11 @@ Only respond with plain text AFTER getting tool results, to explain the results 
 
         response_text = await self.generate(messages, enhanced_prompt, temperature)
 
+        # Strip thinking patterns before any parsing so <think> blocks
+        # don't accidentally contain JSON that gets mistaken for a tool call
+        if self.hide_reasoning:
+            response_text = self._strip_thinking_patterns(response_text)
+
         # Try to parse as tool call
         response_text = response_text.strip()
 
@@ -171,10 +176,6 @@ Only respond with plain text AFTER getting tool results, to explain the results 
                             return {"type": "tool_call", "content": tool_call}
                     except json.JSONDecodeError:
                         pass
-
-        # Regular text response - strip thinking patterns if configured
-        if self.hide_reasoning:
-            response_text = self._strip_thinking_patterns(response_text)
 
         return {"type": "text", "content": response_text}
 
