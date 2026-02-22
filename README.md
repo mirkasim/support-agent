@@ -470,7 +470,7 @@ web_server = create_web_server(web_channel, host="0.0.0.0", port=8001)
 ## 🔒 Security Notes
 
 - **WhatsApp Whitelist**: Only whitelisted contacts can interact via WhatsApp
-- **Web Chat**: Currently open to anyone who can access the URL (add authentication if needed)
+- **Web Chat**: Simple file based credentials used for authenticating web channel users (default: admin/admin)
 - **SSH Keys**: Use key-based SSH authentication (not passwords)
 - **Environment Variables**: Keep `.env` secure, never commit
 - **Network**: Bridge runs on localhost by default (port 3000)
