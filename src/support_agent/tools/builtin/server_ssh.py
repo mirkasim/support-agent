@@ -73,7 +73,7 @@ async def execute_ssh_command(
     timeout = SSH_CONFIG["timeout"]
 
     if server == 'jump_server' or server == 'ssh_jump_host' or server == 'ssh_jump_server' \
-       or server == 'jump.server' or server == 'jump' or server == 'jump-server':
+       or server == '' or server == 'jump' or server == 'jump-server':
         server = SSH_CONFIG["ssh_jump_host"]
 
     print(f"\nSSH Connection Details:")
