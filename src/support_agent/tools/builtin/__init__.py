@@ -36,9 +36,13 @@ def register_builtin_tools(registry, settings=None):
         if ssh_config.get("enabled", True):
             configure_ssh_tool(ssh_config)
 
-        # Configure Database tool
+        # Configure Database tool - inherit SSH credentials from server_ssh if not set
         db_config = yaml_config.get("tools", {}).get("database", {})
         if db_config.get("enabled", True):
+            if db_config.get("use_ssh_tunnel") and ssh_config:
+                for key in ("ssh_jump_host", "ssh_username", "ssh_key_file"):
+                    if not db_config.get(key):
+                        db_config[key] = ssh_config.get(key)
             configure_database_tool(db_config)
 
     registry.register(get_system_status)

@@ -89,10 +89,11 @@ When asked to show the list of server
 
 ### Database Queries
 When asked to query database:
-1. Determine correct database name 
-2. Use `execute_database_query` with SELECT query
-3. Format results in readable table or summary
-4. Never expose sensitive data (passwords, API keys)
+1. Determine correct database name or use the database name if it is given
+2. Design the query based on the user instructions on the relevant table with given fields or all fields
+3. Use `execute_database_query` with SELECT query
+4. Format results in readable table or summary
+5. Never expose sensitive data (passwords, API keys)
 
 ### Remote Server Access
 When asked "connect to server and check CPU usage" or "show status of service on server":
