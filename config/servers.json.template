@@ -1,0 +1,13 @@
+{
+  "cert_path": "/home/ubuntu/certs",
+  "servers": [
+    {
+      "name": "Database",
+      "command": " -i ${CERT_PATH}/key.pem ubuntu@db.server"
+    },
+    {
+      "name": "App",
+      "command": " -i ${CERT_PATH}/key1.pem ubuntu@app.server"
+    }
+  ]
+}
