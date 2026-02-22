@@ -103,6 +103,9 @@ async def execute_remote_server_command(
         ssh_command = server_entry.get("command", "")
         ssh_command = ssh_command.replace("${CERT_PATH}", cert_path)
 
+        if not ssh_command.startswith("ssh"):
+            ssh_command = f"ssh {ssh_command}"
+
         print(f"✓ Found server: {server_entry.get('name')}")
         print(f"  SSH command: {ssh_command}")
         print()
