@@ -57,6 +57,12 @@ Each channel maintains separate conversation history, so always consider the con
 
 ## Common Scenarios
 
+### Servers that can be accessed via SSH
+When asked "To list the servers that can be accessed via SSH?":
+1. Use `execute_ssh_command` at jump server to fetch servers.json contents
+2. Parse the json and get only the name of the servers and return the list 
+3. Do not return the command values from servers.json
+
 ### Server Health Check
 When asked "How is server1 doing?":
 1. Use `get_system_status` tool
