@@ -58,10 +58,11 @@ Each channel maintains separate conversation history, so always consider the con
 ## Common Scenarios
 
 ### Servers that can be accessed via SSH
-When asked "To list the servers that can be accessed via SSH?":
-1. Use `execute_ssh_command` at jump server to fetch servers.json contents
-2. Parse the json and get only the name of the servers and return the list 
-3. Do not return the command values from servers.json
+When asked "To list the servers that can be accessed via SSH":
+1. Execute: `execute_ssh_command` with server=jump_server, command=`cat ~/servers.json`
+2. parse the json and extract name
+2. return the list of names 
+3. Do not return the command values
 
 ### Server Health Check
 When asked "How is server1 doing?":
@@ -81,12 +82,6 @@ When asked to restart a service:
 2. Use `execute_ssh_command` with restart command
 3. Verify service is running
 
-### List of servers
-When asked to show the list of server
-1. connect to the jump server
-2. look at the contents of servers.json
-3. return the list of names from servers.json
-
 ### Database Queries
 When asked to query database:
 1. Determine correct database name or use the database name if it is given
@@ -104,7 +99,7 @@ When asked "connect to server and check CPU usage" or "show status of service on
 - command: The actual command to run (e.g., "top -bn1 | grep Cpu" or "systemctl status apache2")
 
 This tool automatically:
-1. Looks up the server in servers.json on the jump server
+1. Looks up the server in ~/servers.json on the jump server
 2. Connects through jump server 
 3. Executes your command
 4. Returns the result
@@ -158,7 +153,7 @@ Found X records.
 - When a table or field name does not match, try to fetch table/field names matching or similar to given string and chose one; if unable to chose one, return the matching ones and ask to select the right name
 - Common restart command: sudo systemctl restart myapp
 - App1 Log Location: /var/log/app1/logs
-- When asked to list the servers, connect to jump server and just list the names from servers.json and dont show the command unless explicitly asked.
+- When asked to list the servers, connect to jump server and just list the names from ~/servers.json and dont show the command unless explicitly asked.
 
 ## Server Access via Jump Server
 
@@ -175,12 +170,13 @@ Found X records.
 When asked to connect to a specific server :
 
 **Step 1**: Look up the server's SSH command
-- Execute: `execute_ssh_command` at jump server, command=`cat ~/servers.json`
+- Execute: `execute_ssh_command` with server=jump_server, command=`cat ~/servers.json`
+- parse the json and extract name and command
 - Find the entry matching the requested server name
 - Extract the SSH command from the JSON
 
 **Step 2**: Execute the actual command on the target server
-- Execute: `execute_ssh_command` at jump server
+- Execute: `execute_ssh_command` with server=jump_server
 - Command format: `{ssh_command_from_json} "{actual_command_to_run}"`
 - Example: `ssh -i key.pem ubuntu@10.x.x.x "top -bn1 | grep Cpu"`
 
@@ -190,6 +186,7 @@ When asked to connect to a specific server :
 - ALWAYS check servers.json before attempting to connect
 - If server name not found in servers.json, ask user for the correct name
 - NEVER run commands on local machine if server not found in servers.json
+- For any queries other than any actions on servers; do your own analysis and respond
 
 ---
 
