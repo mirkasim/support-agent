@@ -79,9 +79,19 @@ async def main():
         logger.info(f"Connecting to WhatsApp bridge at {settings.bridge_url}")
         whatsapp = WhatsAppChannel(bridge_url=settings.bridge_url, whitelist=whitelist)
 
-        # 8. Connect to WhatsApp
-        await whatsapp.connect()
-        logger.info("Connected to WhatsApp bridge")
+        # 8. Connect to WhatsApp (retry until bridge is available)
+        retry_interval = 10
+        while True:
+            try:
+                await whatsapp.connect()
+                logger.info("Connected to WhatsApp bridge")
+                break
+            except Exception as e:
+                logger.warning(
+                    f"WhatsApp bridge not available ({e}). "
+                    f"Retrying in {retry_interval}s... (Ctrl+C to exit)"
+                )
+                await asyncio.sleep(retry_interval)
 
         # Check status
         status = await whatsapp.get_status()

@@ -127,29 +127,42 @@ async def main():
         web_channel = WebChannel()
 
         # Connect channels
-        await whatsapp.connect()
+        whatsapp_connected = False
+        try:
+            await whatsapp.connect()
+            whatsapp_connected = True
+        except Exception as e:
+            logger.warning("=" * 80)
+            logger.warning(f"WhatsApp bridge not available at {settings.bridge_url}: {e}")
+            logger.warning("WhatsApp channel is DISABLED. Start the bridge to enable it.")
+            logger.warning("=" * 80)
+
         await web_channel.connect()
 
         # Check WhatsApp status
-        status = await whatsapp.get_status()
-        logger.info(f"WhatsApp status: {status}")
+        if whatsapp_connected:
+            status = await whatsapp.get_status()
+            logger.info(f"WhatsApp status: {status}")
 
-        if not status.get("authenticated"):
-            logger.warning(
-                "WhatsApp not authenticated! Run scripts/setup_whatsapp.py to scan QR code"
-            )
+            if not status.get("authenticated"):
+                logger.warning(
+                    "WhatsApp not authenticated! Run scripts/setup_whatsapp.py to scan QR code"
+                )
 
         logger.info("=" * 80)
         logger.info("All channels ready!")
-        logger.info("  - WhatsApp: Connected to bridge")
+        if whatsapp_connected:
+            logger.info("  - WhatsApp: Connected to bridge")
+        else:
+            logger.warning("  - WhatsApp: UNAVAILABLE (bridge not running)")
         logger.info("  - Web Chat: Starting on http://0.0.0.0:8000")
         logger.info("=" * 80)
 
         # 8. Create tasks for each channel
-        tasks = [
-            asyncio.create_task(process_channel_messages(whatsapp, agent, "WhatsApp")),
-            asyncio.create_task(process_channel_messages(web_channel, agent, "Web")),
-        ]
+        tasks = []
+        if whatsapp_connected:
+            tasks.append(asyncio.create_task(process_channel_messages(whatsapp, agent, "WhatsApp")))
+        tasks.append(asyncio.create_task(process_channel_messages(web_channel, agent, "Web")))
 
         # 9. Start web server
         web_server = create_web_server(web_channel, host="0.0.0.0", port=8000)
